@@ -84,13 +84,16 @@ public final class MusicBox extends JavaPlugin {
         ItemStack stack;
 
 
-        if (configObject.isBStats() && bStats == null) {
-            bStats = new Metrics(this, 8766);
-            bStats.addCustomChart(
-                    new SingleLineChart(
-                            "song_count",
-                            () -> MusicBoxSongManager.getAllSongs().size())
-            );
+        if (configObject.isBStatsOptIn()) {
+            if (bStats == null) {
+                bStats = new Metrics(this, 35167);
+                bStats.addCustomChart(
+                        new SingleLineChart("song_count", () -> MusicBoxSongManager.getAllSongs().size())
+                );
+            }
+        } else if (bStats != null) {
+            bStats.shutdown();
+            bStats = null;
         }
         loaded = true;
         SignPlayer.restorePreventedPlayers();
