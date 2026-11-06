@@ -84,8 +84,10 @@ public class PlayListEditorGUI {
                                     saveInProgress = true;
                                     Bukkit.getScheduler().runTaskAsynchronously(MusicBox.getInstance(), () -> {
                                         model.save();
-                                        wrapper.getPlayer().sendMessage(Lang.PLAYLIST_SAVED.toString("{playlist}", model.getName()));
-                                        saveInProgress = false;
+                                        BukkitUtils.runSyncTask(() -> {
+                                            wrapper.getPlayer().sendMessage(Lang.PLAYLIST_SAVED.toString("{playlist}", model.getName()));
+                                            saveInProgress = false;
+                                        });
                                     });
                                 }
 

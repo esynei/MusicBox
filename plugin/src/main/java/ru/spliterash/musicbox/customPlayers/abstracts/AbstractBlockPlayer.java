@@ -41,19 +41,15 @@ public abstract class AbstractBlockPlayer extends PositionSongPlayer implements 
         new BukkitRunnable() {
             @Override
             public void run() {
-                while (!isDestroyed()) {
-                    rangePlayerModel.tick();
-                    every100MillisAsync();
-                    try {
-                        //noinspection BusyWait
-                        Thread.sleep(100);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                        break;
-                    }
+                if (isDestroyed()) {
+                    cancel();
+                    return;
                 }
+
+                rangePlayerModel.tick();
+                every100MillisAsync();
             }
-        }.runTaskAsynchronously(MusicBox.getInstance());
+        }.runTaskTimer(MusicBox.getInstance(), 0L, 2L);
     }
 
     public static <T extends AbstractBlockPlayer> T findByLocation(Location location) {

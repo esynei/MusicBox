@@ -41,7 +41,7 @@ public final class MusicBox extends JavaPlugin {
         saveDefaultValues();
         registerCommand("musicbox", new MusicBoxExecutor());
         Bukkit.getPluginManager().registerEvents(new Handler(), this);
-        Bukkit.getScheduler().runTaskAsynchronously(this, this::reloadPlugin);
+        reloadPlugin();
     }
 
     public void sendMessage(String pex, String noPexMessage, String message) {

@@ -44,18 +44,14 @@ public class SpeakerPlayer extends EntitySongPlayer implements PlayerSongPlayer,
         task = new BukkitRunnable() {
             @Override
             public void run() {
-                while (!isDestroyed()) {
-                    rangeModel.tick();
-                    try {
-                        //noinspection BusyWait
-                        Thread.sleep(100);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                        break;
-                    }
+                if (isDestroyed()) {
+                    cancel();
+                    return;
                 }
+
+                rangeModel.tick();
             }
-        }.runTaskAsynchronously(MusicBox.getInstance());
+        }.runTaskTimer(MusicBox.getInstance(), 0L, 2L);
     }
 
     @Override
