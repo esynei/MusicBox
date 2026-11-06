@@ -2,33 +2,36 @@ package ru.spliterash.musicbox.minecraft.nms;
 
 import org.bukkit.Bukkit;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class NMSUtils {
+    private static final Pattern VERSION_PREFIX = Pattern.compile("^(\\d+)\\.(\\d+)(?:\\.(\\d+))?");
+    private static final Pattern SERVER_VERSION = Pattern.compile("\\(MC:\\s*(\\d+\\.\\d+(?:\\.\\d+)?)\\)");
+    private NMSUtils() {}
 
     public static int parseMajorVersion(String raw) {
-        int firstDotIndex = raw.indexOf(".");
+        Matcher matcher = VERSION_PREFIX.matcher(raw.trim());
+        if (!matcher.find()) {
+            throw new IllegalArgumentException("Cannot parse Minecraft version: " + raw);
+        }
 
-        raw = raw.substring(firstDotIndex + 1);
+        int major = Integer.parseInt(matcher.group(1));
+        int minor = Integer.parseInt(matcher.group(2));
 
-        int secondDotIndex = raw.indexOf(".");
-
-        if (secondDotIndex != -1)
-            raw = raw.substring(0, secondDotIndex);
-
-        return Integer.parseInt(raw);
+        // old numbering: 1.21.11 -> compatibility vers 21
+        // new numbering: 26.3 -> compatibility vers 26
+        return major == 1 ? minor : major;
     }
 
     public static String getRawVersion() {
-        String strVersion = Bukkit.getVersion();
+        Matcher bukkitVersion = VERSION_PREFIX.matcher(Bukkit.getBukkitVersion());
+        if (bukkitVersion.find()) return bukkitVersion.group(0);
 
-        int start = strVersion.indexOf("(MC: ") + 5;
+        Matcher serverVersion = SERVER_VERSION.matcher(Bukkit.getVersion());
+        if (serverVersion.find()) return serverVersion.group(1);
 
-        strVersion = strVersion.substring(start);
-
-        int end = strVersion.indexOf(")");
-
-        strVersion = strVersion.substring(0, end);
-
-        return strVersion;
+        throw new IllegalStateException("Cannot detect Minecraft version from Bukkit: " + Bukkit.getVersion());
     }
 
     public static int getVersion() {
